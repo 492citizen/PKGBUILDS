@@ -1,0 +1,37 @@
+# Maintainer: Levente Polyak <levente[at]leventepolyak[dot]net>
+
+pkgname=dirbuster
+_pkgname=DirBuster
+pkgver=0.12
+pkgrel=10
+pkgdesc="An application designed to brute force directories and files names on web/application servers"
+url='http://www.owasp.org/index.php/Category:OWASP_DirBuster_Project'
+license=('LGPL')
+arch=('any')
+depends=('java-runtime' 'sh')
+source=("https://downloads.sourceforge.net/dirbuster/${_pkgname}-${pkgver/_/-}.tar.bz2")
+sha512sums=('b9ac21824c8beeaf8c483ce287e9a47547dfe035298d5d8941a4057f087272fcf87b173f8a835a6d187cd2c6eef4abf89be1bc144084a85580f5a95e311489e8')
+
+prepare() {
+  cd ${_pkgname}-${pkgver/_/-}
+ 
+  cat > "${pkgname}" <<EOF
+#!/bin/sh
+exec java -jar /usr/lib/${pkgname}/DirBuster-${pkgver/_/-}.jar "\$@"
+EOF
+  chmod +x "${pkgname}"
+}
+
+package() {
+  cd ${_pkgname}-${pkgver/_/-}
+
+  mkdir -p "${pkgdir}/usr/share/${pkgname}"
+  cp -r *.txt "${pkgdir}/usr/share/${pkgname}"
+
+  mkdir -p "${pkgdir}/usr/lib/${pkgname}"
+  cp -r lib *.jar "${pkgdir}/usr/lib/${pkgname}"
+
+  install -Dm 755 "${pkgname}" "${pkgdir}/usr/bin/${pkgname}"
+} 
+
+# vim: ts=2 sw=2 et:
